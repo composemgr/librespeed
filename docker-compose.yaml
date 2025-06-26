@@ -1,0 +1,66 @@
+# nginx proxy address - http://172.17.0.1:62000
+
+name: librespeed
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: ghcr.io/librespeed/speedtest:latest
+    container_name: librespeed-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      WEBPORT: 80
+      DISTANCE: 'mi'
+      MODE: standalone
+      DB_TYPE: sqlite
+      TELEMETRY: 'true'
+      DISABLE_IPINFO: 'false'
+      TZ: ${TZ:-America/New_York}
+      REDACT_IP_ADDRESSES: 'false'
+      ENABLE_ID_OBFUSCATION: 'true'
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      TITLE: '${APP_ORG_NAME:-Libre} SpeedTest'
+      EMAIL: ${EMAIL_SERVER_MAIL_FROM:-no-reply@$BASE_HOST_NAME}
+      PASSWORD: ${APP_API_TOKEN:-q9Rg8Vk4ZL5tvUPsBwZVchLlvZOdwTMQ}
+      IPINFO_APIKEY: '${IPINFO_APIKEY:-}'
+    ports:
+      - '172.17.0.1:62000:80'
+    volumes:
+      - './rootfs/data:/database:z'
+      - './rootfs/config:/config:z'
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'cloudflare.hostname=librespeed.${CLOUDFLARE_ZONE_NAME}'
+      - 'cloudflare.service=http://librespeed-app:3000'
+      - 'traefik.docker.network=proxy'
+      - 'traefik.http.routers.librespeed-app.entrypoints=http'
+      - 'traefik.http.routers.librespeed-app-secure.tls=true'
+      - 'traefik.http.routers.librespeed-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.librespeed-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.librespeed-app.middlewares=librespeed-app-https-redirect'
+      - 'traefik.http.routers.librespeed-app-secure.entrypoints=https'
+      - 'traefik.http.routers.librespeed-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.librespeed-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.librespeed-app-secure.service=librespeed-app'
+      - 'traefik.http.services.librespeed-app.loadbalancer.server.port=3000'
+    networks:
+      - librespeed
+      - proxy
+      - cloudflare
+
+networks:
+  librespeed:
+    name: librespeed
+    external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
