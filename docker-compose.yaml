@@ -1,0 +1,44 @@
+# nginx proxy address - http://172.17.0.1:62000
+
+name: librespeed
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: ghcr.io/librespeed/speedtest:latest
+    container_name: librespeed-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      WEBPORT: 80
+      DISTANCE: mi
+      MODE: standalone
+      DB_TYPE: sqlite
+      TELEMETRY: true
+      DISABLE_IPINFO: false
+      REDACT_IP_ADDRESSES: false
+      ENABLE_ID_OBFUSCATION: true
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      TITLE: ${APP_ORG_NAME:-Libre} SpeedTest
+      EMAIL: ${EMAIL_SERVER_MAIL_FROM:-no-reply@${BASE_DOMAIN_NAME:-${BASE_HOST_NAME}}}
+      PASSWORD: ${APP_ADMIN_PASS:-changeme_admin_password}
+      IPINFO_APIKEY: ${IPINFO_APIKEY:-}
+    ports:
+      - '172.17.0.1:62000:80'
+    volumes:
+      - './rootfs/data/librespeed:/database:z'
+      - './rootfs/config/librespeed:/config:z'
+    networks:
+      - librespeed
+
+networks:
+  librespeed:
+    name: librespeed
+    external: false
