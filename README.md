@@ -48,8 +48,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/librespeed` - Data storage
-- `./rootfs/config/librespeed` - Data storage
+- `./volumes/data/librespeed` - Data storage
+- `./volumes/config/librespeed` - Data storage
 
 ## 🔐 Security
 
