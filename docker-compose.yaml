@@ -19,7 +19,7 @@ services:
       TZ: ${TZ:-America/New_York}
       CONTAINER_NAME: librespeed-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
-      WEBPORT: 80
+      WEBPORT: 8080
       DISTANCE: mi
       MODE: standalone
       DB_TYPE: sqlite
@@ -32,7 +32,7 @@ services:
       PASSWORD: ${APP_ADMIN_PASS:-changeme_admin_password}
       IPINFO_APIKEY: ${IPINFO_APIKEY:-}
     ports:
-      - '172.17.0.1:62000:80'
+      - '172.17.0.1:62000:8080'
     volumes:
       - './volumes/data/librespeed:/database:z'
       - './volumes/config/librespeed:/config:z'
@@ -44,7 +44,7 @@ services:
       - 'traefik.enable=true'
       - 'cloudflare.enable=true'
       - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://librespeed-app:80'
+      - 'cloudflare.service=http://librespeed-app:8080'
       - 'cloudflare.hostname=librespeed.${CLOUDFLARE_ZONE_NAME:-}'
       - 'traefik.http.routers.librespeed-app.entrypoints=http'
       - 'traefik.http.routers.librespeed-app-secure.tls=true'
@@ -55,7 +55,7 @@ services:
       - 'traefik.http.routers.librespeed-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
       - 'traefik.http.routers.librespeed-app-secure.tls.certresolver=cloudflare'
       - 'traefik.http.routers.librespeed-app-secure.service=librespeed-app'
-      - 'traefik.http.services.librespeed-app.loadbalancer.server.port=80'
+      - 'traefik.http.services.librespeed-app.loadbalancer.server.port=8080'
 
 networks:
   librespeed:
