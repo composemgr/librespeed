@@ -26,8 +26,8 @@ services:
       REDACT_IP_ADDRESSES: false
       ENABLE_ID_OBFUSCATION: true
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
-      TITLE: ${APP_ORG_NAME:-Libre} SpeedTest
-      EMAIL: ${EMAIL_SERVER_MAIL_FROM:-no-reply@${BASE_DOMAIN_NAME:-${BASE_HOST_NAME}}}
+      TITLE: ${APP_ORG_NAME:-LibreSpeed} SpeedTest
+      EMAIL: ${EMAIL_SERVER_MAIL_FROM:-no-reply@example.com}
       PASSWORD: ${APP_ADMIN_PASS:-changeme_admin_password}
       IPINFO_APIKEY: ${IPINFO_APIKEY:-}
     ports:
