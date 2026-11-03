@@ -30,6 +30,12 @@ services:
       EMAIL: ${EMAIL_SERVER_MAIL_FROM:-no-reply@example.com}
       PASSWORD: ${APP_ADMIN_PASS:-replace-with-a-random-password}
       IPINFO_APIKEY: ${IPINFO_APIKEY:-}
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:$${WEBPORT}/ || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     volumes:
       - './volumes/data/librespeed:/database:z'
       - './volumes/config/librespeed:/config:z'
